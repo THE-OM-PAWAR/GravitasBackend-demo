@@ -5,7 +5,16 @@ const uploadOnCloudinary = require("../config/cloudinary"); // Cloudinary helper
 // ✅ Create Event
 const createEvent = async (req, res) => {
   try {
-    const { title, date, startTime, endTime, capacity, location, description, communityId } = req.body;
+    const {
+      title,
+      date,
+      startTime,
+      endTime,
+      capacity,
+      location,
+      description,
+      communityId,
+    } = req.body;
     const createdBy = req.user.id; // Assuming authentication middleware adds `req.user`
 
     // Check if the community exists
@@ -16,7 +25,9 @@ const createEvent = async (req, res) => {
 
     // Ensure only the community creator can create events
     if (!community.createdBy.equals(createdBy)) {
-      return res.status(403).json({ message: "Only the community creator can create events" });
+      return res
+        .status(403)
+        .json({ message: "Only the community creator can create events" });
     }
 
     // Auto-generate uniqueId from title (lowercase & replace spaces with hyphens)
@@ -25,7 +36,9 @@ const createEvent = async (req, res) => {
     // Check if event uniqueId already exists
     const existingEvent = await Event.findOne({ uniqueId });
     if (existingEvent) {
-      return res.status(400).json({ message: "Event with this title already exists" });
+      return res
+        .status(400)
+        .json({ message: "Event with this title already exists" });
     }
 
     // Upload banner if provided
@@ -105,7 +118,8 @@ const getEventById = async (req, res) => {
 // ✅ Update Event
 const updateEvent = async (req, res) => {
   try {
-    const { title, date, startTime, endTime, capacity, location, description } = req.body;
+    const { title, date, startTime, endTime, capacity, location, description } =
+      req.body;
     const event = await Event.findById(req.params.id);
 
     if (!event) {
@@ -114,7 +128,9 @@ const updateEvent = async (req, res) => {
 
     // Ensure only the event creator can update the event
     if (!event.createdBy.equals(req.user.id)) {
-      return res.status(403).json({ message: "You are not authorized to update this event" });
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to update this event" });
     }
 
     // Update fields
@@ -145,17 +161,47 @@ const deleteEvent = async (req, res) => {
 
     // Ensure only the event creator can delete the event
     if (!event.createdBy.equals(req.user.id)) {
-      return res.status(403).json({ message: "You are not authorized to delete this event" });
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to delete this event" });
     }
 
     // Remove event from the associated community
-    await Community.findByIdAndUpdate(event.community, { $pull: { events: event._id } });
+    await Community.findByIdAndUpdate(event.community, {
+      $pull: { events: event._id },
+    });
 
     await event.deleteOne();
 
     res.status(200).json({ message: "Event deleted successfully" });
   } catch (error) {
     console.error("Error deleting event:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const getEventsByCommunityId = async (req, res) => {
+  try {
+    const { communityId } = req.params;
+
+    // Check if the community exists
+    const community = await Community.findById(communityId);
+    if (!community) {
+      return res.status(404).json({ message: "Community not found" });
+    }
+
+    // Fetch all events of the community
+    const events = await Event.find({ community: communityId })
+      .populate("createdBy", "name email")
+      .sort({ date: 1 }); // Sorting events by date
+
+    res.status(200).json({
+      success: true,
+      count: events.length,
+      events,
+    });
+  } catch (error) {
+    console.error("Error fetching events:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -167,4 +213,5 @@ module.exports = {
   getEventById,
   updateEvent,
   deleteEvent,
+  getEventsByCommunityId
 };

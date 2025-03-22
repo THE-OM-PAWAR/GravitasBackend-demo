@@ -3,6 +3,7 @@ const { protect } = require("../middleware/auth");
 const {
   createCommunity,
   getAllCommunities,
+  myCommunities,
 } = require("../controllers/communityController");
 const { upload } = require("../middleware/multer.middleware");
 
