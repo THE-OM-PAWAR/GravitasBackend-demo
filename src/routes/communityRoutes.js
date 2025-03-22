@@ -21,7 +21,7 @@ router.post(
 
 router.get("/all", getAllCommunities);
 router.get("/my-communities", protect, myCommunities);
-// router.post('/login', authController.login);
+// router.post('/login', authController.login);                                                             
 // router.post('/verify-otp', authController.verifyOTP);
 // router.post('/resend-otp', authController.resendOTP);
 // router.post('/login-with-otp', authController.loginWithOTP);
