@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/database');
 const authRoutes = require('./routes/authRoutes');
+const communityRoutes = require('./routes/communityRoutes');
 
 // Load environment variables
 require('dotenv').config();
@@ -17,6 +18,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/community', communityRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
