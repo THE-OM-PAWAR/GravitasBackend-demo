@@ -1,5 +1,5 @@
-import Community from "../models/community.js";
-import { uploadOnCloudinary } from "../config/cloudinary.js"; // Cloudinary helper function
+const uploadOnCloudinary = require("../utils/cloudinary.js")
+const Community = require("../models/community"); // Cloudinary helper function
 
 export const createCommunity = async (req, res) => {
   try {
@@ -48,3 +48,25 @@ export const createCommunity = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
+
+
+const getAllCommunities = async (req, res) => {
+  try {
+    const communities = await Community.find()
+      .populate("createdBy", "name email")
+      .populate("events", "title date");
+
+    res.status(200).json({
+      success: true,
+      count: communities.length,
+      communities,
+    });
+  } catch (error) {
+    console.error("Error fetching communities:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+module.exports = { getAllCommunities };
