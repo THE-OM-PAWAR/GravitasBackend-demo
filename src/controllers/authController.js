@@ -1,8 +1,16 @@
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const dotenv = require("dotenv");
-const { User } = require('../models/User');
+const User = require('../models/User');
 dotenv.config();
+
+
+const options = {
+  httpOnly: true,
+  secure: true
+}
+
+
 
 const generateAccessAndRefereshTokens = async (userId) => {
   try {
@@ -61,12 +69,13 @@ exports.signup = async (req, res) => {
 
     const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(newUser._id);
 
-    res.status(201).json({
-      status: 'success',
-      accessToken,
-      refreshToken,
-      data: { user: newUser },
-    });
+    res.status(201).cookie("accessToken", accessToken, options)
+      .cookie("refreshToken", refreshToken, options).json({
+        status: 'success',
+        accessToken,
+        refreshToken,
+        data: { user: newUser },
+      });
   } catch (error) {
     res.status(400).json({ status: 'fail', message: error.message });
   }
@@ -88,13 +97,15 @@ exports.verifyOTP = async (req, res) => {
 
     const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(user._id);
 
-    res.status(200).json({
-      status: 'success',
-      accessToken,
-      refreshToken,
-      data: { user },
-    });
+    res.status(200).cookie("accessToken", accessToken, options)
+      .cookie("refreshToken", refreshToken, options).json({
+        status: 'success',
+        accessToken,
+        refreshToken,
+        data: { user },
+      });
   } catch (error) {
+
     res.status(400).json({ status: 'fail', message: error.message });
   }
 };
@@ -123,11 +134,21 @@ exports.resendOTP = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log(req.body);
+
     if (!email || !password) return res.status(400).json({ status: 'fail', message: 'Please provide email and password' });
 
-    const user = await User.findOne({ email }).select('+password');
+
+    const user = await User.findOne({
+      email: email
+    })
+    console.log(user._id)
+    if (!user) {
+      // throw new ApiError(404, "User does not exist")
+    }
+
     if (!user || !(await user.comparePassword(password))) {
-      return res.status(401).json({ status: 'fail', message: 'Incorrect email or password' });
+      return res.status(400).json({ status: 'fail', message: "Incorrect email or password" });
     }
 
     if (!user.isVerified) {
@@ -139,13 +160,15 @@ exports.login = async (req, res) => {
 
     const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(user._id);
 
-    res.status(200).json({
-      status: 'success',
-      accessToken,
-      refreshToken,
-      data: { user },
-    });
+    res.status(200).cookie("accessToken", accessToken, options)
+      .cookie("refreshToken", refreshToken, options).json({
+        status: 'success',
+        accessToken,
+        refreshToken,
+        data: { user },
+      });
   } catch (error) {
+    console.log(error)
     res.status(400).json({ status: 'fail', message: error.message });
   }
 };
@@ -184,12 +207,13 @@ exports.verifyLoginOTP = async (req, res) => {
 
     const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(user._id);
 
-    res.status(200).json({
-      status: 'success',
-      accessToken,
-      refreshToken,
-      data: { user },
-    });
+    res.status(200).cookie("accessToken", accessToken, options)
+      .cookie("refreshToken", refreshToken, options).json({
+        status: 'success',
+        accessToken,
+        refreshToken,
+        data: { user },
+      });
   } catch (error) {
     res.status(400).json({ status: 'fail', message: error.message });
   }

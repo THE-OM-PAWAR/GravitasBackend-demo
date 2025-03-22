@@ -32,6 +32,9 @@ const userSchema = new mongoose.Schema({
     code: String,
     expiresAt: Date
   },
+  refreshToken: {
+    type: String
+},
   createdAt: {
     type: Date,
     default: Date.now
@@ -95,4 +98,5 @@ userSchema.methods.generateRefreshToken = function() {
 };
 
 // ✅ Export using CommonJS
-module.exports = mongoose.model("User", userSchema);
+const User =  mongoose.model("User", userSchema);
+module.exports = User
