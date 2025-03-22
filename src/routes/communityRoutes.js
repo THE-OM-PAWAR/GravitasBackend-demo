@@ -1,10 +1,18 @@
 const express = require('express');
 const authController = require('../controllers/authController');
 const { protect } = require('../middleware/auth');
+const { createCommunity } = require('../controllers/communityController');
+const { upload } = require('../middleware/multer.middleware');
 
 const router = express.Router();
 
-router.post('/create-community', protect , authController.signup);
+router.post(
+    "/create",
+    protect,
+    upload.fields([{ name: "banner", maxCount: 1 }, { name: "logo", maxCount: 1 }]),
+    createCommunity
+  );
+  
 // router.post('/login', authController.login);
 // router.post('/verify-otp', authController.verifyOTP);
 // router.post('/resend-otp', authController.resendOTP);
