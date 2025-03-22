@@ -1,5 +1,5 @@
-const uploadOnCloudinary = require("../utils/cloudinary.js")
-const Community = require("../models/community"); // Cloudinary helper function
+const uploadOnCloudinary = require("../utils/cloudinary.js");
+const Community = require("../models/community"); // Community model
 
 const createCommunity = async (req, res) => {
   try {
@@ -49,11 +49,6 @@ const createCommunity = async (req, res) => {
   }
 };
 
-module.exports = { createCommunity };
-
-
-
-
 const getAllCommunities = async (req, res) => {
   try {
     const communities = await Community.find()
@@ -71,4 +66,4 @@ const getAllCommunities = async (req, res) => {
   }
 };
 
-module.exports = { getAllCommunities };
+module.exports = { createCommunity, getAllCommunities };
