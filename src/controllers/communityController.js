@@ -66,4 +66,24 @@ const getAllCommunities = async (req, res) => {
   }
 };
 
-module.exports = { createCommunity, getAllCommunities };
+
+const myCommunities = async (req, res) => {
+    try {
+      const userId = req.user.id; // Assuming authentication middleware adds `req.user`
+  
+      const communities = await Community.find({ "members.user": userId })
+        .populate("createdBy", "name email") // Populate creator details
+        .populate("events", "title date"); // Populate event details
+  
+      res.status(200).json({
+        success: true,
+        count: communities.length,
+        communities,
+      });
+    } catch (error) {
+      console.error("Error fetching user communities:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  };
+
+  module.exports = { createCommunity, getAllCommunities, myCommunities };
