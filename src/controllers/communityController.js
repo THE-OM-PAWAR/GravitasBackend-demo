@@ -1,7 +1,7 @@
 const uploadOnCloudinary = require("../utils/cloudinary.js")
 const Community = require("../models/community"); // Cloudinary helper function
 
-export const createCommunity = async (req, res) => {
+const createCommunity = async (req, res) => {
   try {
     const { name, uniqueId, description } = req.body;
     const createdBy = req.user.id; // Assuming authentication middleware adds `req.user`
@@ -48,6 +48,8 @@ export const createCommunity = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+module.exports = { createCommunity };
 
 
 
