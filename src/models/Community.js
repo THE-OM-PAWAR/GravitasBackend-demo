@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const communitySchema = new mongoose.Schema(
   {
@@ -123,4 +123,4 @@ communitySchema.statics.findAdminCommunities = function (userId) {
 
 const Community = mongoose.model("Community", communitySchema);
 
-export default Community;
+module.exports = Community;
